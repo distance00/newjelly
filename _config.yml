@@ -1,3 +1,4 @@
 theme: jekyll-theme-cayman
 title: cayman blog
 description: welcome here
+show_downloads: true
