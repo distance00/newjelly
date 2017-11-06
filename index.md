@@ -1,37 +1,54 @@
-## Welcome to GitHub Pages
+## win7系统开启ipv6的方法 （其它window系统类似）
 
-You can use the [editor on GitHub](https://github.com/distance00/newjelly/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+### 方法 1
+保存下面命令为bat文件，以管理员身份双击执行
+```
+@echo off
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+net start "ip helper"
+netsh int ipv6 reset
 
-### Markdown
+netsh int teredo set state default
+netsh int 6to4 set state default
+netsh int isatap set state default
+netsh int teredo set state server=teredo.remlab.net
+netsh int ipv6 set teredo enterpriseclient
+netsh int ter set state enterpriseclient
+route DELETE ::/0
+netsh int ipv6 add route ::/0 "Teredo Tunneling Pseudo-Interface"
+netsh int ipv6 set prefix 2002::/16 30 1
+netsh int ipv6 set prefix 2001::/32 5 1
+Reg add HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\Dnscache\Parameters /v AddrConfigControl /t REG_DWORD /d 0 /f
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+netsh int teredo set state default
+netsh int 6to4 set state default
+netsh int isatap set state default
+netsh int teredo set state server=teredo.remlab.net
+netsh int ipv6 set teredo enterpriseclient
+netsh int ter set state enterpriseclient
+route DELETE ::/0
+netsh int ipv6 add route ::/0 "Teredo Tunneling Pseudo-Interface"
+netsh int ipv6 set prefix 2002::/16 30 1
+netsh int ipv6 set prefix 2001::/32 5 1
+Reg add HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\Dnscache\Parameters /v AddrConfigControl /t REG_DWORD /d 0 /f
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+ipconfig /all
+ipconfig /flushdns
+netsh int ipv6 show teredo
+netsh int ipv6 show route
+netsh int ipv6 show int
+netsh int ipv6 show prefix
+netsh int ipv6 show address
+route print
+cmd
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+### 方法 2 （手动，更直观）
 
-### Jekyll Themes
+1 计算机 “管理”----“服务和应用程序”-------“服务”-------启用IP helper
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/distance00/newjelly/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+2 打开组策略 gpedit.msc
+‘’计算机配置‘’------管理模版----“网络”-----‘’TCPIP设置‘’------‘’IPV6转换技术-----‘’ISATAP状态‘’设置为“已启用‘’
+‘’TEREDO服务器名称‘’设置‘’已启用 ‘’，3个服务器中选一个设置：teredo.remlab.net ------teredo-debian.remlab.net----teredo.trex.fi
+‘’TEREDO状态‘’设置为“已启用‘’ 选择企业客户端
 
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
